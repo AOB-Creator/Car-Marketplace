@@ -1,0 +1,284 @@
+<!-- HERO -->
+<section class="hero container">
+  <div class="hero__copy reveal">
+    <span class="pill"><span class="dot"></span> 2026 kolleksiyasi endi avtoparkda</span>
+    <h1 class="display">Orzuingizdagi avtomobil,<br />istalgan vaqt, istalgan joyda</h1>
+    <p>CARZONE — tanlangan premium avtomobillar, tezkor bron va eshigingizgacha yetkazib berish. Har bir safar unutilmas bo‘lsin.</p>
+    <div class="hero__cta">
+      <a routerLink="/cars" class="btn btn--dark">Avtomobil tanlash <app-icon name="arrow-up-right" [size]="16" /></a>
+      <a routerLink="/cars" [queryParams]="{ sort: 'rating' }" class="btn btn--light">Avtoparkni ko‘rish</a>
+    </div>
+  </div>
+
+  @if (hero(); as car) {
+    <div class="hero__stage">
+      <span class="hero__word" aria-hidden="true">{{ car.make.split('-')[0] }}</span>
+      @for (c of [car]; track c.id) {
+        <app-car-image class="hero__car" [car]="c" [eager]="true" [width]="1400" />
+      }
+      <a class="float float--l" [routerLink]="['/cars', car.id]">
+        <span class="eyebrow">{{ car.body }}</span>
+        <b>{{ car.make }} {{ car.model }}</b>
+        <small>{{ car.year }} · {{ car.trim }}</small>
+      </a>
+      <div class="float float--r">
+        <div><b>{{ car.hp }}</b><span>o.k.</span></div>
+        <div><b>{{ car.accel }}s</b><span>0–100</span></div>
+        <div><b>${{ car.rentPerDay }}</b><span>/kun</span></div>
+      </div>
+      <div class="hero__nav">
+        <button class="icon-btn" type="button" aria-label="Oldingi" (click)="nextHero(-1)"><app-icon name="arrow-left" [size]="16" /></button>
+        <div class="dots">
+          @for (c of heroCars(); track c.id; let i = $index) {
+            <button type="button" [class.on]="i === heroIndex()" [attr.aria-label]="c.model" (click)="heroIndex.set(i)"></button>
+          }
+        </div>
+        <button class="icon-btn icon-btn--dark" type="button" aria-label="Keyingi" (click)="nextHero(1)"><app-icon name="arrow-right" [size]="16" /></button>
+      </div>
+    </div>
+  }
+
+  <form class="finder" (submit)="$event.preventDefault(); search()">
+    <label>
+      <span>Brend</span>
+      <select [value]="searchBrand()" (change)="searchBrand.set($any($event.target).value)">
+        <option value="">Barcha brendlar</option>
+        @for (b of brands; track b) { <option [value]="b">{{ b }}</option> }
+      </select>
+    </label>
+    <label>
+      <span>Kuzov turi</span>
+      <select [value]="searchBody()" (change)="searchBody.set($any($event.target).value)">
+        <option value="">Istalgan</option>
+        @for (b of bodies; track b) { <option [value]="b">{{ b }}</option> }
+      </select>
+    </label>
+    <label>
+      <span>Byudjet</span>
+      <select [value]="searchBudget()" (change)="searchBudget.set($any($event.target).value)">
+        <option value="">Cheklovsiz</option>
+        <option value="30000">$30 000 gacha</option>
+        <option value="60000">$60 000 gacha</option>
+        <option value="100000">$100 000 gacha</option>
+        <option value="250000">$250 000 gacha</option>
+      </select>
+    </label>
+    <button class="btn btn--dark" type="submit"><app-icon name="search" [size]="16" /> Qidirish</button>
+  </form>
+</section>
+
+<!-- BRANDS -->
+<section class="brands">
+  <div class="brands__track">
+    @for (round of [0, 1]; track round) {
+      @for (b of brands; track b) {
+        <a [routerLink]="['/cars']" [queryParams]="{ brand: b }">{{ b }}</a>
+      }
+    }
+  </div>
+</section>
+
+<!-- ABOUT / STATS -->
+<section class="intro container">
+  <h2 class="section-title">Hashamatda yashang,<br />erkinlikda haydang</h2>
+  <div>
+    <p class="lead">Qulaylik, quvvat va uslub uchun yaratilgan premium avtomobil xizmati. Qisqa biznes safarmi yoki uzoq dam olish kunlarimi — avtoparkimiz har bir sayohatingizni yuksaltiradi.</p>
+    <div class="stats">
+      @for (s of stats; track s.label) {
+        <div><b>{{ s.value }}</b><span>{{ s.label }}</span></div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- PERFECT RIDE -->
+<section class="block container">
+  <div class="block__head">
+    <div>
+      <h2 class="section-title">O‘zingizga mos avtomobilni toping</h2>
+      <p class="section-sub">Hashamatli va sport avtomobillarning qo‘lda tanlangan kolleksiyasi — har bir safar uchun.</p>
+    </div>
+    <a routerLink="/cars" class="btn btn--dark btn--sm">Butun avtopark</a>
+  </div>
+  <div class="ride-grid">
+    @for (car of perfect(); track car!.id) {
+      <article class="ride">
+        <a class="ride__img" [routerLink]="['/cars', car!.id]">
+          <app-car-image [car]="car!" [width]="700" />
+        </a>
+        <h3>{{ car!.make }} {{ car!.model }} {{ car!.year }}</h3>
+        <ul>
+          <li><app-icon name="car" [size]="14" /> {{ car!.body }}</li>
+          <li><app-icon name="seat" [size]="14" /> {{ car!.seats }} o‘rin</li>
+          <li><app-icon name="gauge" [size]="14" /> {{ car!.transmission }}</li>
+        </ul>
+        <div class="ride__price"><b>${{ car!.rentPerDay }}</b><span>/ kun</span></div>
+        <a class="btn btn--ghost btn--block" [routerLink]="['/cars', car!.id]">Batafsil</a>
+        <a class="btn btn--dark btn--block" [routerLink]="['/cars', car!.id]" fragment="book">Bron qilish</a>
+      </article>
+    }
+  </div>
+</section>
+
+<!-- LUXURY MEETS RELIABILITY -->
+<section class="lux">
+  <div class="container">
+    <div class="block__head">
+      <div>
+        <h2 class="section-title">Hashamat va ishonchlilik</h2>
+        <p class="section-sub">Hashamatli avtomobillar nafosatini muammosiz ijara tajribasi bilan uyg‘unlashtiramiz.</p>
+      </div>
+      <div class="tabs" role="tablist">
+        @for (s of services; track s.key; let i = $index) {
+          <button type="button" role="tab" [class.on]="i === service()" [attr.aria-selected]="i === service()" (click)="service.set(i)">{{ s.label }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="dial">
+      <svg class="dial__arc" viewBox="0 0 1000 520" aria-hidden="true">
+        <path d="M60 500a440 440 0 0 1 880 0" fill="none" stroke="#d9d9de" stroke-width="1.2" />
+        <path d="M120 500a380 380 0 0 1 760 0" fill="none" stroke="#e6e6e9" stroke-width="44" />
+        <path d="M120 500a380 380 0 0 1 760 0" fill="none" stroke="#d9d9de" stroke-width="1" stroke-dasharray="2 14" />
+        <path d="M200 500a300 300 0 0 1 600 0" fill="none" stroke="#d9d9de" stroke-width="1.2" />
+      </svg>
+      <div class="dial__marks">
+        @for (s of services; track s.key; let i = $index) {
+          <button type="button" class="mark" [class.on]="i === service()"
+            [style.--a]="-90 + (i - service()) * 26 + 'deg'" (click)="service.set(i)">
+            <span>{{ '0' + (i + 1) }}</span>
+          </button>
+        }
+      </div>
+      @if (services[service()]; as s) {
+        <div class="dial__card">
+          <span class="dial__num">0{{ service() + 1 }}</span>
+          <h3>{{ s.title }}</h3>
+          @if (serviceCar(); as car) {
+            @for (c of [car]; track c.id) {
+              <app-car-image class="dial__car" [car]="c" [width]="700" />
+            }
+          }
+          <p>{{ s.text }}</p>
+          <a routerLink="/about" class="btn btn--dark btn--sm">Batafsil</a>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- TOP PICKS -->
+<section class="block container">
+  <div class="block__head">
+    <div>
+      <h2 class="section-title">Haftaning eng yaxshilari</h2>
+      <p class="section-sub">Eng ko‘p ijaraga olingan va yuqori baholangan avtomobillar.</p>
+    </div>
+    <a routerLink="/cars" [queryParams]="{ sort: 'rating' }" class="btn btn--dark btn--sm">Barchasini ko‘rish</a>
+  </div>
+  <div class="picks" #picks>
+    @for (car of topPicks(); track car.id) {
+      <a class="pick" [routerLink]="['/cars', car.id]">
+        <app-car-image [car]="car" [width]="700" />
+        <div class="pick__meta">
+          <span>{{ car.make }} {{ car.model }}</span>
+          <span class="rating"><app-icon name="star" [size]="13" [fill]="true" /> {{ car.rating }}</span>
+        </div>
+        <span class="pick__price">${{ car.price | number }}</span>
+      </a>
+    }
+  </div>
+  <div class="carousel-nav">
+    <button class="icon-btn" type="button" aria-label="Orqaga" (click)="scrollPicks(-1)"><app-icon name="chevron-left" [size]="16" /></button>
+    <button class="icon-btn icon-btn--dark" type="button" aria-label="Oldinga" (click)="scrollPicks(1)"><app-icon name="chevron-right" [size]="16" /></button>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="block container">
+  <div class="block__head">
+    <div>
+      <h2 class="section-title">Oddiy. Tez. Muammosiz.</h2>
+      <p class="section-sub">Bir necha daqiqada yo‘lga chiqing — tanlashdan bronni tasdiqlashgacha.</p>
+    </div>
+    <a routerLink="/cars" class="btn btn--dark btn--sm">Bronni boshlash</a>
+  </div>
+  <div class="steps">
+    <div class="steps__grid">
+      @for (s of steps; track s.title; let i = $index) {
+        <div class="step">
+          <span class="step__n">0{{ i + 1 }}</span>
+          <h4>{{ s.title }}</h4>
+          <p>{{ s.text }}</p>
+        </div>
+      }
+    </div>
+    @if (heroCars()[1]; as car) {
+      <div class="steps__visual">
+        <app-car-image [car]="car" [width]="800" angle="01" />
+        <div class="steps__badge">
+          <app-icon name="shield" [size]="18" />
+          <div><b>To‘liq sug‘urta</b><span>Har bir ijarada</span></div>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="block container">
+  <div class="block__head">
+    <div>
+      <h2 class="section-title">Minglab mijozlar ishonchi</h2>
+      <p class="section-sub">Haqiqiy haydovchilarning haqiqiy fikrlari.</p>
+    </div>
+    <div class="carousel-nav carousel-nav--top">
+      <button class="icon-btn" type="button" aria-label="Oldingi fikr" (click)="moveQuote(-1)"><app-icon name="chevron-left" [size]="16" /></button>
+      <button class="icon-btn icon-btn--dark" type="button" aria-label="Keyingi fikr" (click)="moveQuote(1)"><app-icon name="chevron-right" [size]="16" /></button>
+    </div>
+  </div>
+  <div class="quotes">
+    <div class="quotes__track" [style.transform]="'translateX(calc(' + -quote() + ' * (var(--qw) + 20px)))'">
+      @for (t of testimonials; track t.name; let i = $index) {
+        <figure class="quote" [class.on]="i === quote()">
+          <span class="quote__mark">“</span>
+          <blockquote>{{ t.text }}</blockquote>
+          <figcaption>
+            <span class="avatar">{{ initials(t.name) }}</span>
+            <div><b>{{ t.name }}</b><span>{{ t.city }}</span></div>
+            <span class="stars">
+              @for (s of [1, 2, 3, 4, 5]; track s) {
+                <app-icon name="star" [size]="12" [fill]="s <= t.rating" />
+              }
+            </span>
+          </figcaption>
+        </figure>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="block container faq">
+  <div>
+    <h2 class="section-title">Savollaringiz bormi?<br />Javoblarimiz tayyor!</h2>
+    <p class="section-sub">Premium avtomobil ijarasi haqida eng ko‘p beriladigan savollar.</p>
+    <a routerLink="/faq" class="btn btn--light btn--sm faq__more">Barcha savollar <app-icon name="arrow-right" [size]="14" /></a>
+  </div>
+  <app-faq-list [items]="faq.slice(0, 6)" />
+</section>
+
+<!-- CTA -->
+<section class="container">
+  <div class="cta">
+    <div>
+      <span class="eyebrow">CARZONE Dashboard</span>
+      <h2>Avtoparkingizni bitta oynadan boshqaring</h2>
+      <p>Buyurtmalar, mijozlar, daromad va avtomobillar holati — real vaqtda.</p>
+      <a routerLink="/dashboard" class="btn btn--accent">Dashboardni ochish <app-icon name="arrow-up-right" [size]="16" /></a>
+    </div>
+    @if (heroCars()[2]; as car) {
+      <app-car-image class="cta__car" [car]="car" [width]="900" />
+    }
+  </div>
+</section>

@@ -1,0 +1,95 @@
+<header class="header" [class.header--scrolled]="scrolled()">
+  <div class="container header__inner">
+    <nav class="nav" aria-label="Asosiy menyu">
+      @for (item of nav; track item.link) {
+        <a [routerLink]="item.link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.exact }">{{ item.label }}</a>
+      }
+    </nav>
+
+    <a routerLink="/" class="logo" aria-label="CARZONE bosh sahifa">C A R Z O N E</a>
+
+    <div class="actions">
+      <a routerLink="/cars" [queryParams]="{ fav: 1 }" class="icon-link" aria-label="Sevimlilar">
+        <app-icon name="heart" />
+        @if (store.favorites().length) {
+          <span class="count">{{ store.favorites().length }}</span>
+        }
+      </a>
+      <a routerLink="/dashboard" class="icon-link" aria-label="Profil">
+        <app-icon name="user" />
+      </a>
+      <a routerLink="/dashboard" class="btn btn--dark btn--sm dash-btn">
+        <app-icon name="grid" [size]="15" /> Dashboard
+      </a>
+      <button class="icon-link burger" type="button" aria-label="Menyu" (click)="menuOpen.set(!menuOpen())">
+        <app-icon [name]="menuOpen() ? 'x' : 'menu'" />
+      </button>
+    </div>
+  </div>
+
+  @if (menuOpen()) {
+    <div class="mobile-menu">
+      @for (item of nav; track item.link) {
+        <a [routerLink]="item.link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.exact }">
+          {{ item.label }} <app-icon name="arrow-up-right" [size]="16" />
+        </a>
+      }
+      <a routerLink="/dashboard" class="btn btn--dark btn--block">Dashboardga o‘tish</a>
+    </div>
+  }
+</header>
+
+<main>
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a routerLink="/" class="logo">C A R Z O N E</a>
+        <p>2020-yildan beri premium avtomobillarni sotish va ijaraga berish bo‘yicha ishonchli hamkoringiz. Har bir safar — qulay va esda qolarli.</p>
+        <div class="socials">
+          <a href="#" aria-label="Instagram"><app-icon name="instagram" [size]="16" /></a>
+          <a href="#" aria-label="Telegram"><app-icon name="telegram" [size]="16" /></a>
+          <a href="#" aria-label="YouTube"><app-icon name="youtube" [size]="16" /></a>
+        </div>
+      </div>
+      <div>
+        <h4>Tezkor havolalar</h4>
+        <a routerLink="/">Bosh sahifa</a>
+        <a routerLink="/about">Biz haqimizda</a>
+        <a routerLink="/cars">Avtopark</a>
+        <a routerLink="/faq">FAQ</a>
+        <a routerLink="/dashboard">Dashboard</a>
+      </div>
+      <div>
+        <h4>Aloqa</h4>
+        <p>Amir Temur ko‘chasi 108,<br />Toshkent, O‘zbekiston</p>
+        <a href="tel:+998712000000">+998 71 200 00 00</a>
+        <a href="mailto:info@carzone.uz">info&#64;carzone.uz</a>
+      </div>
+      <form class="footer__news" (submit)="subscribe($event)">
+        <h4>Yangiliklarga obuna</h4>
+        <p>Yangi avtomobillar va maxsus takliflar haqida birinchi bo‘lib biling.</p>
+        <input class="input" type="email" placeholder="Email manzilingiz" aria-label="Email"
+          [value]="email()" (input)="email.set($any($event.target).value)" />
+        <button class="btn btn--dark btn--block" type="submit">Obuna bo‘lish</button>
+      </form>
+    </div>
+    <div class="footer__bottom">
+      <span>© {{ year }} CARZONE. Barcha huquqlar himoyalangan.</span>
+      <div>
+        <a href="#">Maxfiylik siyosati</a>
+        <a href="#">Foydalanish shartlari</a>
+        <a href="#">Cookie</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+@if (store.toast(); as t) {
+  <div class="toast" role="status">
+    <app-icon name="check" [size]="16" /> {{ t.text }}
+  </div>
+}

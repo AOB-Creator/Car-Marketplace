@@ -1,0 +1,237 @@
+<div class="wrap">
+  <!-- FILTER PANEL -->
+  <aside class="filter" [class.open]="filtersOpen()">
+    <div class="filter__head">
+      <b>Filtrlash</b>
+      <button type="button" class="reset" (click)="reset()">Tozalash <app-icon name="x" [size]="12" /></button>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Ijara turi</span>
+      <div class="pills">
+        <button type="button" [class.on]="rental() === 'any'" (click)="setRental('any')">Istalgan</button>
+        <button type="button" [class.on]="rental() === 'day'" (click)="setRental('day')">Kunlik</button>
+        <button type="button" [class.on]="rental() === 'hour'" (click)="setRental('hour')">Soatlik</button>
+      </div>
+    </div>
+
+    <button type="button" class="block block--row" (click)="availableOnly.set(!availableOnly())">
+      <span class="eyebrow">Faqat hozir bo‘shlar</span>
+      <span class="switch" [class.switch--on]="availableOnly()"></span>
+    </button>
+
+    <div class="block">
+      <button type="button" class="acc" (click)="section('price')">
+        <span class="eyebrow">Narx oralig‘i / {{ unit() }}</span>
+        <app-icon name="chevron-down" [size]="14" [class.flip]="open()['price']" />
+      </button>
+      @if (open()['price']) {
+        <app-price-range class="acc__body" [values]="allPrices()" [min]="bounds().min" [max]="bounds().max" [step]="1"
+          [buckets]="36" [tall]="true" fromLabel="dan" toLabel="gacha"
+          [low]="sliderLow()" (lowChange)="low.set($event)" [high]="sliderHigh()" (highChange)="high.set($event)" />
+      }
+    </div>
+
+    <div class="block">
+      <button type="button" class="acc" (click)="section('brand')">
+        <span class="eyebrow">Avtomobil brendi</span>
+        @if (selBrands().length) { <span class="badge badge--dark badge--plain">{{ selBrands().length }}</span> }
+        <app-icon name="chevron-down" [size]="14" [class.flip]="open()['brand']" />
+      </button>
+      @if (open()['brand']) {
+        <div class="checks acc__body">
+          @for (b of brands; track b) {
+            <label class="checkbox"><input type="checkbox" [checked]="selBrands().includes(b)" (change)="toggle(selBrands, b)" /> {{ b }}</label>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="block">
+      <button type="button" class="acc" (click)="section('year')">
+        <span class="eyebrow">Model yili</span>
+        <app-icon name="chevron-down" [size]="14" [class.flip]="open()['year']" />
+      </button>
+      @if (open()['year']) {
+        <div class="pills acc__body">
+          @for (y of [2023, 2024, 2025]; track y) {
+            <button type="button" [class.on]="yearFrom() === y" (click)="yearFrom.set(y)">{{ y }}+</button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="block">
+      <button type="button" class="acc" (click)="section('body')">
+        <span class="eyebrow">Kuzov turi</span>
+        <app-icon name="chevron-down" [size]="14" [class.flip]="open()['body']" />
+      </button>
+      @if (open()['body']) {
+        <div class="checks checks--2 acc__body">
+          @for (b of bodies; track b) {
+            <label class="checkbox"><input type="checkbox" [checked]="selBodies().includes(b)" (change)="toggle(selBodies, b)" /> {{ b }}</label>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="block">
+      <button type="button" class="acc" (click)="section('tr')">
+        <span class="eyebrow">Uzatma</span>
+        <app-icon name="chevron-down" [size]="14" [class.flip]="open()['tr']" />
+      </button>
+      @if (open()['tr']) {
+        <div class="pills acc__body">
+          <button type="button" [class.on]="transmission() === 'any'" (click)="transmission.set('any')">Istalgan</button>
+          <button type="button" [class.on]="transmission() === 'Avtomat'" (click)="transmission.set('Avtomat')">Avtomat</button>
+          <button type="button" [class.on]="transmission() === 'Mexanika'" (click)="transmission.set('Mexanika')">Mexanika</button>
+        </div>
+      }
+    </div>
+
+    <div class="block">
+      <button type="button" class="acc" (click)="section('fuel')">
+        <span class="eyebrow">Yoqilg‘i turi</span>
+        <app-icon name="chevron-down" [size]="14" [class.flip]="open()['fuel']" />
+      </button>
+      @if (open()['fuel']) {
+        <div class="checks checks--2 acc__body">
+          @for (f of fuels; track f) {
+            <label class="checkbox"><input type="checkbox" [checked]="selFuels().includes(f)" (change)="toggle(selFuels, f)" /> {{ f }}</label>
+          }
+        </div>
+      }
+    </div>
+
+    <button type="button" class="btn btn--dark btn--block show" (click)="filtersOpen.set(false)">{{ results().length }} ta natija</button>
+  </aside>
+  @if (filtersOpen()) {
+    <div class="scrim" (click)="filtersOpen.set(false)"></div>
+  }
+
+  <!-- RESULTS -->
+  <section class="list">
+    <header class="list__head">
+      <h1>{{ results().length }} ta avtomobil {{ rental() === 'any' ? 'avtoparkda' : 'ijaraga' }}</h1>
+      <div class="tools">
+        <button type="button" class="btn btn--light btn--sm mob" (click)="filtersOpen.set(true)"><app-icon name="sliders" [size]="14" /> Filtr</button>
+        <label class="mini-search">
+          <app-icon name="search" [size]="14" />
+          <input type="search" placeholder="Qidirish" [value]="query()" (input)="query.set($any($event.target).value)" aria-label="Avtomobil qidirish" />
+        </label>
+        <div class="sort">
+          <button type="button" class="link" (click)="sortOpen.set(!sortOpen())">{{ sortLabel() }} <app-icon name="chevron-down" [size]="14" /></button>
+          @if (sortOpen()) {
+            <div class="menu">
+              @for (s of sorts; track s.key) {
+                <button type="button" [class.on]="sort() === s.key" (click)="sort.set(s.key); sortOpen.set(false)">{{ s.label }}</button>
+              }
+            </div>
+          }
+        </div>
+        <span class="divider"></span>
+        <button type="button" class="link" (click)="view.set(view() === 'grid' ? 'table' : 'grid')">
+          {{ view() === 'grid' ? 'Jadval' : 'Kartalar' }} <app-icon [name]="view() === 'grid' ? 'rows' : 'grid'" [size]="15" />
+        </button>
+        <button type="button" class="btn btn--dark btn--sm" (click)="editing.set(null)"><app-icon name="plus" [size]="14" /> Qo‘shish</button>
+      </div>
+    </header>
+
+    @if (!results().length) {
+      <div class="empty">
+        <app-icon name="car" [size]="28" />
+        <h3>Mos avtomobil topilmadi</h3>
+        <button type="button" class="btn btn--dark btn--sm" (click)="reset()">Filtrlarni tozalash</button>
+      </div>
+    } @else if (view() === 'grid') {
+      <div class="grid">
+        @for (car of results(); track car.id; let i = $index) {
+          <article class="v" [style.animation-delay.ms]="(i % 9) * 40">
+            <div class="v__top">
+              <span><app-icon name="walk" [size]="14" /> <b>{{ car.distance }}m</b> <span class="muted">({{ minutes(car.distance) }} daq)</span></span>
+              <span><app-icon name="star" [size]="13" [fill]="true" class="gold" /> <b>{{ car.rating }}</b> <span class="muted">({{ car.reviews }})</span></span>
+              <button type="button" class="heart" [class.on]="store.isFavorite(car.id)" aria-label="Sevimli" (click)="store.toggleFavorite(car.id)">
+                <app-icon name="heart" [size]="16" [fill]="store.isFavorite(car.id)" />
+              </button>
+            </div>
+            <a class="v__img" [routerLink]="['/cars', car.id]">
+              <app-car-image [car]="car" [width]="600" />
+            </a>
+            <div class="v__body">
+              <div>
+                <h3>{{ car.make === 'Mercedes-Benz' ? 'Mercedes' : car.make }} {{ car.model }}</h3>
+                <p>{{ car.trim }} ({{ car.hp }} o.k., {{ car.drive }})</p>
+              </div>
+              <div class="v__price">
+                @if (rental() === 'any') {
+                  <b>${{ car.price | number }}</b>
+                } @else {
+                  <b>${{ unitPrice(car) | number: '1.2-2' }}</b><span>/ {{ unit() }}</span>
+                }
+              </div>
+            </div>
+            <div class="v__actions">
+              <span class="badge" [class]="carBadge(car.status)">{{ car.status }}</span>
+              <button type="button" class="icon-btn icon-btn--sm" aria-label="Tahrirlash" (click)="editing.set(car)"><app-icon name="edit" [size]="14" /></button>
+              <button type="button" class="icon-btn icon-btn--sm danger" aria-label="O‘chirish" (click)="confirmDelete.set(car)"><app-icon name="trash" [size]="14" /></button>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr><th>Avtomobil</th><th>Kuzov</th><th>Yoqilg‘i</th><th>Quvvat</th><th>Narx</th><th>Ijara/kun</th><th>Joylashuv</th><th>Holat</th><th></th></tr>
+            </thead>
+            <tbody>
+              @for (car of results(); track car.id) {
+                <tr>
+                  <td>
+                    <a class="thumb" [routerLink]="['/cars', car.id]">
+                      <app-car-image [car]="car" [width]="200" />
+                      <div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.trim }} · {{ car.year }}</small></div>
+                    </a>
+                  </td>
+                  <td>{{ car.body }}</td>
+                  <td>{{ car.fuel.join(', ') }}</td>
+                  <td>{{ car.hp }} o.k.</td>
+                  <td><b>${{ car.price | number }}</b></td>
+                  <td>${{ car.rentPerDay }}</td>
+                  <td class="muted">{{ car.location }}</td>
+                  <td><span class="badge" [class]="carBadge(car.status)">{{ car.status }}</span></td>
+                  <td>
+                    <div class="row-actions">
+                      <button type="button" class="icon-btn icon-btn--sm" aria-label="Tahrirlash" (click)="editing.set(car)"><app-icon name="edit" [size]="14" /></button>
+                      <button type="button" class="icon-btn icon-btn--sm danger" aria-label="O‘chirish" (click)="confirmDelete.set(car)"><app-icon name="trash" [size]="14" /></button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </section>
+</div>
+
+@let edit = editing();
+@if (edit !== undefined) {
+  <app-vehicle-editor [car]="edit" (saved)="save($event)" (closed)="editing.set(undefined)" />
+}
+
+@if (confirmDelete(); as car) {
+  <div class="modal-scrim" (click)="confirmDelete.set(null)">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="del-title" (click)="$event.stopPropagation()">
+      <app-car-image [car]="car" [width]="500" />
+      <h3 id="del-title">{{ car.make }} {{ car.model }} o‘chirilsinmi?</h3>
+      <p>Bu amalni ortga qaytarib bo‘lmaydi. Avtomobil katalogdan va sevimlilardan olib tashlanadi.</p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--light" (click)="confirmDelete.set(null)">Bekor qilish</button>
+        <button type="button" class="btn btn--dark del" (click)="remove()"><app-icon name="trash" [size]="15" /> O‘chirish</button>
+      </div>
+    </div>
+  </div>
+}

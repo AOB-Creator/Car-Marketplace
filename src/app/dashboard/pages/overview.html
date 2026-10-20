@@ -1,0 +1,191 @@
+<div class="dash-head">
+  <div>
+    <h1>Xush kelibsiz, Akmal</h1>
+    <p>Bugun avtoparkingizda nimalar bo‘layotganini ko‘ring.</p>
+  </div>
+  <div class="dash-head__tools">
+    <div class="segmented">
+      <button type="button" [class.on]="period() === '7d'" (click)="period.set('7d')">7 kun</button>
+      <button type="button" [class.on]="period() === '30d'" (click)="period.set('30d')">30 kun</button>
+      <button type="button" [class.on]="period() === '12m'" (click)="period.set('12m')">12 oy</button>
+    </div>
+    <button type="button" class="btn btn--light btn--sm" (click)="store.notify('Hisobot yuklab olinmoqda...')"><app-icon name="download" [size]="14" /> Eksport</button>
+    <a routerLink="/dashboard/vehicles" [queryParams]="{ new: 1 }" class="btn btn--dark btn--sm"><app-icon name="plus" [size]="14" /> Avtomobil qo‘shish</a>
+  </div>
+</div>
+
+<!-- KPIs -->
+<section class="kpis">
+  @for (k of kpis(); track k.label; let i = $index) {
+    <article class="kpi" [class.kpi--dark]="i === 0" [style.animation-delay.ms]="i * 70">
+      <div class="kpi__top">
+        <span class="kpi__icon"><app-icon [name]="k.icon" [size]="16" /></span>
+        <span class="delta" [class.delta--down]="k.delta < 0">
+          <app-icon [name]="k.delta < 0 ? 'trend-down' : 'trend-up'" [size]="13" /> {{ k.delta > 0 ? '+' : '' }}{{ k.delta }}%
+        </span>
+      </div>
+      <span class="kpi__label">{{ k.label }}</span>
+      <b class="kpi__value">{{ k.prefix }}{{ k.value | number }}</b>
+      <app-sparkline [values]="k.spark" [color]="i === 0 ? '#36c58c' : '#0b0b0c'" />
+    </article>
+  }
+</section>
+
+<!-- REVENUE + BRAND SHARE -->
+<section class="row row--21">
+  <article class="panel">
+    <div class="panel__head">
+      <div>
+        <h3>Daromad dinamikasi</h3>
+        <p>Sotuv va ijaradan tushum, USD</p>
+      </div>
+      <div class="legend">
+        @for (s of chart().series; track s.name) {
+          <span><i [style.background]="s.color"></i>{{ s.name }}</span>
+        }
+      </div>
+    </div>
+    <app-area-chart [series]="chart().series" [labels]="chart().labels" prefix="$" />
+  </article>
+
+  <article class="panel">
+    <div class="panel__head">
+      <div>
+        <h3>Brendlar bo‘yicha</h3>
+        <p>Buyurtmalar ulushi</p>
+      </div>
+      <button type="button" class="icon-btn icon-btn--sm" aria-label="Ko‘proq"><app-icon name="more" [size]="16" /></button>
+    </div>
+    <app-donut [items]="brandShare()" caption="buyurtma" />
+    <div class="goal">
+      <div class="goal__row"><span>Oylik maqsad</span><b>78%</b></div>
+      <div class="progress"><span style="width: 78%"></span></div>
+      <small>$284 600 / $365 000</small>
+    </div>
+  </article>
+</section>
+
+<!-- ORDERS + FLEET -->
+<section class="row row--21">
+  <article class="panel">
+    <div class="panel__head">
+      <div>
+        <h3>So‘nggi buyurtmalar</h3>
+        <p>Oxirgi 24 soat ichida</p>
+      </div>
+      <a routerLink="/dashboard/orders" class="btn btn--light btn--sm">Barchasi <app-icon name="arrow-right" [size]="14" /></a>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr><th>Buyurtma</th><th>Mijoz</th><th>Avtomobil</th><th>Turi</th><th>Summa</th><th>Holat</th></tr>
+        </thead>
+        <tbody>
+          @for (o of recent(); track o.id) {
+            <tr>
+              <td><b>{{ o.id }}</b><br /><small class="muted">{{ shortDate(o.date) }}</small></td>
+              <td>
+                <div class="person">
+                  <span [style.background]="avatarBg(o.customer)">{{ initials(o.customer.name) }}</span>
+                  <div><b>{{ o.customer.name }}</b><small>{{ o.customer.city }}</small></div>
+                </div>
+              </td>
+              <td>
+                @if (o.car; as car) {
+                  <div class="thumb"><app-car-image [car]="car" [width]="200" /><div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.year }}</small></div></div>
+                }
+              </td>
+              <td>{{ o.kind }}</td>
+              <td><b>{{ o.amount ? '$' + (o.amount | number) : '—' }}</b></td>
+              <td><span class="badge" [class]="orderBadge(o.status)">{{ o.status }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <div class="stack">
+    <article class="panel">
+      <div class="panel__head">
+        <div>
+          <h3>Avtopark holati</h3>
+          <p>{{ store.cars().length }} ta avtomobil</p>
+        </div>
+      </div>
+      <div class="stacked">
+        @for (f of fleet(); track f.label) {
+          <span [style.width.%]="f.pct" [style.background]="f.color" [title]="f.label + ': ' + f.value"></span>
+        }
+      </div>
+      <ul class="fleet">
+        @for (f of fleet(); track f.label) {
+          <li><i [style.background]="f.color"></i>{{ f.label }}<b>{{ f.value }}</b></li>
+        }
+      </ul>
+    </article>
+
+    @if (star(); as car) {
+      <a class="panel star" [routerLink]="['/cars', car.id]">
+        <span class="badge badge--dark badge--plain"><app-icon name="star" [size]="12" [fill]="true" /> Oy avtomobili</span>
+        <app-car-image [car]="car" [width]="600" />
+        <div class="star__meta">
+          <div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.reviews }} ta buyurtma · {{ car.rating }} ★</small></div>
+          <span class="icon-btn icon-btn--sm icon-btn--dark"><app-icon name="arrow-up-right" [size]="14" /></span>
+        </div>
+      </a>
+    }
+  </div>
+</section>
+
+<!-- WEEKLY + TOP + ACTIVITY -->
+<section class="row row--3">
+  <article class="panel">
+    <div class="panel__head">
+      <div>
+        <h3>Haftalik bronlar</h3>
+        <p>Joriy hafta</p>
+      </div>
+      <span class="delta"><app-icon name="trend-up" [size]="13" /> +14%</span>
+    </div>
+    <app-bar-chart [values]="weekly" [labels]="weekdays" [highlight]="5" />
+  </article>
+
+  <article class="panel">
+    <div class="panel__head">
+      <div>
+        <h3>Eng faol avtomobillar</h3>
+        <p>Buyurtmalar soni bo‘yicha</p>
+      </div>
+    </div>
+    <ul class="top">
+      @for (car of topCars(); track car.id; let i = $index) {
+        <li>
+          <span class="top__n">{{ i + 1 }}</span>
+          <app-car-image [car]="car" [width]="200" />
+          <div><b>{{ car.make }} {{ car.model }}</b><small>${{ car.rentPerDay }}/kun</small></div>
+          <div class="top__bar"><span [style.width.%]="(car.reviews / topCars()[0].reviews) * 100"></span></div>
+          <em>{{ car.reviews }}</em>
+        </li>
+      }
+    </ul>
+  </article>
+
+  <article class="panel">
+    <div class="panel__head">
+      <div>
+        <h3>Faollik</h3>
+        <p>Real vaqt</p>
+      </div>
+      <span class="live"><i></i> Jonli</span>
+    </div>
+    <ul class="feed">
+      @for (a of activity; track a.text) {
+        <li>
+          <span class="icon-btn icon-btn--sm"><app-icon [name]="a.icon" [size]="14" /></span>
+          <div><p>{{ a.text }}</p><small>{{ a.time }}</small></div>
+        </li>
+      }
+    </ul>
+  </article>
+</section>

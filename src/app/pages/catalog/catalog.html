@@ -1,0 +1,146 @@
+<div class="container page">
+  <div class="shell">
+    <!-- FILTERS -->
+    <aside class="filters" [class.open]="filtersOpen()" aria-label="Filtrlar">
+      <div class="filters__head">
+        <span class="filters__title"><span class="icon-btn icon-btn--sm"><app-icon name="sliders" [size]="15" /></span> Filtrlar</span>
+        @if (activeCount()) {
+          <button type="button" class="reset" (click)="reset()">Tozalash ({{ activeCount() }}) <app-icon name="x" [size]="13" /></button>
+        }
+        <button type="button" class="icon-btn icon-btn--sm close" aria-label="Yopish" (click)="filtersOpen.set(false)"><app-icon name="x" [size]="15" /></button>
+      </div>
+
+      <label class="search">
+        <app-icon name="search" [size]="16" />
+        <input type="search" placeholder="Qidirish..." [value]="query()" (input)="query.set($any($event.target).value)" aria-label="Avtomobil qidirish" />
+      </label>
+
+      <section>
+        <h4 class="eyebrow">Yoqilg‘i turi</h4>
+        <div class="chips">
+          @for (f of fuels; track f) {
+            <button type="button" class="chip" [class.chip--on]="selFuels().includes(f)" (click)="toggle(selFuels, f)">{{ f }}</button>
+          }
+        </div>
+      </section>
+
+      <section>
+        <h4 class="eyebrow">Narx</h4>
+        <app-price-range [values]="prices()" [min]="floor" [max]="ceil" [step]="1000" [(low)]="low" [(high)]="high" />
+      </section>
+
+      <section>
+        <h4 class="eyebrow">Brendlar</h4>
+        <div class="checks" [class.checks--fade]="!showAllBrands()">
+          @for (b of showAllBrands() ? brands : brands.slice(0, 8); track b) {
+            <label class="checkbox">
+              <input type="checkbox" [checked]="selBrands().includes(b)" (change)="toggle(selBrands, b)" />
+              <span>{{ b }}</span>
+              <small>{{ brandCounts()[b] }}</small>
+            </label>
+          }
+        </div>
+        @if (brands.length > 8) {
+          <button type="button" class="more" (click)="showAllBrands.set(!showAllBrands())">
+            {{ showAllBrands() ? 'Kamroq' : 'Yana ' + (brands.length - 8) + ' ta' }}
+            <app-icon [name]="showAllBrands() ? 'chevron-down' : 'chevron-right'" [size]="14" />
+          </button>
+        }
+      </section>
+
+      <section>
+        <h4 class="eyebrow">Kuzov turi</h4>
+        <div class="chips">
+          @for (b of bodies; track b) {
+            <button type="button" class="chip chip--pill" [class.chip--on]="selBodies().includes(b)" (click)="toggle(selBodies, b)">{{ b }}</button>
+          }
+        </div>
+      </section>
+
+      <section>
+        <h4 class="eyebrow">Uzatmalar qutisi</h4>
+        <div class="segmented">
+          <button type="button" [class.on]="transmission() === 'all'" (click)="transmission.set('all')">Istalgan</button>
+          <button type="button" [class.on]="transmission() === 'Avtomat'" (click)="transmission.set('Avtomat')">Avtomat</button>
+          <button type="button" [class.on]="transmission() === 'Mexanika'" (click)="transmission.set('Mexanika')">Mexanika</button>
+        </div>
+      </section>
+
+      <section class="toggles">
+        <button type="button" class="toggle-row" (click)="onlyAvailable.set(!onlyAvailable())">
+          <span>Faqat sotuvdagilar</span>
+          <span class="switch" [class.switch--on]="onlyAvailable()"></span>
+        </button>
+        <button type="button" class="toggle-row" (click)="onlyFav.set(!onlyFav())">
+          <span>Faqat sevimlilar</span>
+          <span class="switch" [class.switch--on]="onlyFav()"></span>
+        </button>
+      </section>
+
+      <button type="button" class="btn btn--dark btn--block apply" (click)="filtersOpen.set(false)">{{ results().length }} ta natijani ko‘rsatish</button>
+    </aside>
+    @if (filtersOpen()) {
+      <div class="scrim" (click)="filtersOpen.set(false)"></div>
+    }
+
+    <!-- RESULTS -->
+    <section class="results">
+      <header class="results__head">
+        <h1>Sotuvda <span>({{ results().length }})</span></h1>
+        <div class="tools">
+          <button type="button" class="btn btn--light btn--sm mobile-filters" (click)="filtersOpen.set(true)">
+            <app-icon name="sliders" [size]="15" /> Filtrlar
+            @if (activeCount()) { <span class="badge badge--dark badge--plain">{{ activeCount() }}</span> }
+          </button>
+          <div class="sort">
+            <button type="button" class="btn btn--light btn--sm" [attr.aria-expanded]="sortOpen()" (click)="sortOpen.set(!sortOpen())">
+              {{ sortLabel() }} <app-icon name="arrow-down" [size]="14" />
+            </button>
+            @if (sortOpen()) {
+              <div class="menu" role="menu">
+                @for (s of sorts; track s.key) {
+                  <button type="button" role="menuitem" [class.on]="sort() === s.key" (click)="setSort(s.key)">
+                    {{ s.label }} @if (sort() === s.key) { <app-icon name="check" [size]="14" /> }
+                  </button>
+                }
+              </div>
+            }
+          </div>
+          <span class="divider"></span>
+          <button type="button" class="icon-btn" [class.icon-btn--active]="layout() === 'grid'" aria-label="Grid ko‘rinish" (click)="layout.set('grid')"><app-icon name="grid" [size]="16" /></button>
+          <button type="button" class="icon-btn" [class.icon-btn--active]="layout() === 'list'" aria-label="Ro‘yxat ko‘rinish" (click)="layout.set('list')"><app-icon name="rows" [size]="16" /></button>
+        </div>
+      </header>
+
+      @if (selBrands().length || selFuels().length || selBodies().length) {
+        <div class="active-tags">
+          @for (b of selBrands(); track b) { <button type="button" class="chip chip--pill" (click)="toggle(selBrands, b)">{{ b }} <app-icon name="x" [size]="12" /></button> }
+          @for (f of selFuels(); track f) { <button type="button" class="chip chip--pill" (click)="toggle(selFuels, f)">{{ f }} <app-icon name="x" [size]="12" /></button> }
+          @for (b of selBodies(); track b) { <button type="button" class="chip chip--pill" (click)="toggle(selBodies, b)">{{ b }} <app-icon name="x" [size]="12" /></button> }
+        </div>
+      }
+
+      @if (visible().length) {
+        <div class="grid" [class.grid--list]="layout() === 'list'">
+          @for (car of visible(); track car.id; let i = $index) {
+            <app-car-card [car]="car" [layout]="layout()" class="reveal" [style.animation-delay.ms]="(i % 8) * 50" />
+          }
+        </div>
+        @if (visible().length < results().length) {
+          <div class="load">
+            <button type="button" class="btn btn--light" (click)="loadMore()">
+              Yana ko‘rsatish <span class="muted">({{ results().length - visible().length }})</span>
+            </button>
+          </div>
+        }
+      } @else {
+        <div class="empty">
+          <span class="icon-btn"><app-icon name="search" /></span>
+          <h3>Hech narsa topilmadi</h3>
+          <p>Filtrlarni o‘zgartirib ko‘ring yoki ularni tozalang.</p>
+          <button type="button" class="btn btn--dark btn--sm" (click)="reset()">Filtrlarni tozalash</button>
+        </div>
+      }
+    </section>
+  </div>
+</div>
