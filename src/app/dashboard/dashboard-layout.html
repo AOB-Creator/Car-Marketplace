@@ -35,6 +35,11 @@
       <a routerLink="/faq" title="Yordam"><app-icon name="support" /><span class="label">Yordam</span></a>
       <button type="button" (click)="logout()" title="Chiqish"><app-icon name="logout" /><span class="label">Chiqish</span></button>
     </nav>
+
+    <a class="credit" [href]="credit.url" target="_blank" rel="noopener" [title]="'Made by ' + credit.name">
+      <span class="credit__mark">TC</span>
+      <span class="label">Made by <b>{{ credit.name }}</b></span>
+    </a>
   </aside>
   @if (navOpen()) {
     <div class="scrim" (click)="navOpen.set(false)"></div>

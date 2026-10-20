@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { CarStore } from '../core/car-store.service';
 import { ACTIVITY, CONVERSATIONS, ORDERS } from '../core/data/crm.data';
+import { CREDIT } from '../core/brand';
 import { Icon } from '../shared/icon';
 
 @Component({
@@ -25,6 +26,7 @@ export class DashboardLayout {
   protected readonly bellOpen = signal(false);
   protected readonly collapsed = signal(false);
   protected readonly activity = ACTIVITY;
+  protected readonly credit = CREDIT;
 
   protected readonly unread = CONVERSATIONS.reduce((n, c) => n + c.unread, 0);
   protected readonly newOrders = ORDERS.filter((o) => o.status === 'Yangi').length;
