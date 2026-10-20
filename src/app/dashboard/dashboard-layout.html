@@ -1,0 +1,90 @@
+<div class="app" [class.app--collapsed]="collapsed()">
+  <aside class="side" [class.open]="navOpen()">
+    <a routerLink="/" class="brand" title="Saytga qaytish">
+      <span class="brand__mark"><app-icon name="car" [size]="18" [stroke]="2" /></span>
+      <span class="brand__text">CARZONE<small>DASHBOARD</small></span>
+    </a>
+
+    <nav class="nav" aria-label="Dashboard menyusi">
+      @for (item of main(); track item.link) {
+        <a [routerLink]="item.link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: !!item.exact }" [title]="item.label">
+          <app-icon [name]="item.icon" />
+          <span class="label">{{ item.label }}</span>
+          @if (item.count) { <span class="count">{{ item.count }}</span> }
+        </a>
+      }
+      <span class="sep"></span>
+      @for (item of secondary; track item.link) {
+        <a [routerLink]="item.link" routerLinkActive="active" [title]="item.label">
+          <app-icon [name]="item.icon" />
+          <span class="label">{{ item.label }}</span>
+          @if (item.count) { <span class="count count--dot">{{ item.count }}</span> }
+        </a>
+      }
+    </nav>
+
+    <div class="upgrade">
+      <span class="icon-btn icon-btn--sm"><app-icon name="crown" [size]="14" /></span>
+      <b>PRO imkoniyatlar</b>
+      <p>AI narxlash, avtomatik hisobotlar va cheksiz avtopark.</p>
+      <button type="button" class="btn btn--accent btn--sm btn--block" (click)="store.notify('PRO tarif tez orada!')">Yangilash</button>
+    </div>
+
+    <nav class="nav nav--bottom">
+      <a routerLink="/dashboard/settings" routerLinkActive="active" title="Sozlamalar"><app-icon name="settings" /><span class="label">Sozlamalar</span></a>
+      <a routerLink="/faq" title="Yordam"><app-icon name="support" /><span class="label">Yordam</span></a>
+      <button type="button" (click)="logout()" title="Chiqish"><app-icon name="logout" /><span class="label">Chiqish</span></button>
+    </nav>
+  </aside>
+  @if (navOpen()) {
+    <div class="scrim" (click)="navOpen.set(false)"></div>
+  }
+
+  <div class="main">
+    <header class="top">
+      <button type="button" class="icon-btn icon-btn--sm burger" aria-label="Menyu" (click)="navOpen.set(true)"><app-icon name="menu" [size]="16" /></button>
+      <button type="button" class="icon-btn icon-btn--sm collapse" aria-label="Menyuni yig‘ish" (click)="collapsed.set(!collapsed())"><app-icon [name]="collapsed() ? 'chevron-right' : 'chevron-left'" [size]="16" /></button>
+      <span class="meta"><app-icon name="clock" [size]="15" /> {{ time() }} <span class="muted">(UTC +5)</span></span>
+      <span class="meta hide-sm"><app-icon name="navigation" [size]="14" /> Toshkent, UZ</span>
+
+      <form class="search" (submit)="search($event, q.value)">
+        <app-icon name="search" [size]="15" />
+        <input #q type="search" placeholder="Avtomobil, buyurtma, mijoz..." aria-label="Qidirish" />
+        <kbd>⌘K</kbd>
+      </form>
+
+      <div class="top__right">
+        <div class="bell">
+          <button type="button" class="icon-btn icon-btn--sm" aria-label="Bildirishnomalar" (click)="bellOpen.set(!bellOpen())">
+            <app-icon name="bell" [size]="16" />
+            <span class="ping"></span>
+          </button>
+          @if (bellOpen()) {
+            <div class="drop">
+              <div class="drop__head"><b>Bildirishnomalar</b><a routerLink="/dashboard/notifications">Barchasi</a></div>
+              @for (a of activity; track a.text) {
+                <div class="drop__item">
+                  <span class="icon-btn icon-btn--sm"><app-icon [name]="a.icon" [size]="14" /></span>
+                  <div><p>{{ a.text }}</p><small>{{ a.time }}</small></div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <span class="pro hide-sm"><app-icon name="crown" [size]="13" /> PRO</span>
+        <a routerLink="/dashboard/settings" class="me">
+          <span class="avatar">AK</span>
+          <span class="me__text hide-sm"><b>Akmal Karimov</b><small>Administrator</small></span>
+        </a>
+      </div>
+    </header>
+
+    <div class="content">
+      <router-outlet />
+    </div>
+  </div>
+</div>
+
+@if (store.toast(); as t) {
+  <div class="toast" role="status"><app-icon name="check" [size]="16" /> {{ t.text }}</div>
+}

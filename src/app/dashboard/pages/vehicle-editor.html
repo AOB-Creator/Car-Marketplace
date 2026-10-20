@@ -1,0 +1,136 @@
+<div class="scrim" (click)="closed.emit()"></div>
+<form class="drawer" [formGroup]="form" (ngSubmit)="submit()" role="dialog" aria-modal="true" aria-labelledby="ed-title" novalidate>
+  <header class="drawer__head">
+    <div>
+      <span class="eyebrow">{{ car() ? 'Tahrirlash' : 'Yangi avtomobil' }}</span>
+      <h2 id="ed-title">{{ preview().make }} {{ preview().model || 'Model' }}</h2>
+    </div>
+    <button type="button" class="icon-btn icon-btn--sm" aria-label="Yopish" (click)="closed.emit()"><app-icon name="x" [size]="16" /></button>
+  </header>
+
+  <div class="drawer__body">
+    <div class="preview">
+      <app-car-image [car]="preview()" [color]="colors()[0]?.hex ?? null" [width]="700" />
+      <div class="preview__chips">
+        <span class="badge badge--dark badge--plain">{{ preview().hp }} o.k.</span>
+        <span class="badge badge--plain">{{ preview().accel }}s 0–100</span>
+        <span class="badge badge--plain">${{ preview().price.toLocaleString('en-US') }}</span>
+      </div>
+    </div>
+
+    <fieldset>
+      <legend>Asosiy</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="make">Brend</label>
+          <select id="make" class="input" formControlName="make">
+            @for (b of brands; track b) { <option [value]="b">{{ b }}</option> }
+          </select>
+        </div>
+        <div class="field">
+          <label for="model">Model *</label>
+          <input id="model" class="input" formControlName="model" placeholder="masalan, X5 M" />
+          @if (invalid('model')) { <small class="err">Model nomini kiriting</small> }
+        </div>
+        <div class="field">
+          <label for="trim">Komplektatsiya</label>
+          <input id="trim" class="input" formControlName="trim" placeholder="Competition" />
+        </div>
+        <div class="field">
+          <label for="year">Yil *</label>
+          <input id="year" class="input" type="number" formControlName="year" />
+          @if (invalid('year')) { <small class="err">1990–2027 oralig‘ida</small> }
+        </div>
+        <div class="field">
+          <label for="body">Kuzov</label>
+          <select id="body" class="input" formControlName="body">
+            @for (b of bodies; track b) { <option [value]="b">{{ b }}</option> }
+          </select>
+        </div>
+        <div class="field">
+          <label for="status">Holat</label>
+          <select id="status" class="input" formControlName="status">
+            @for (s of statuses; track s) { <option [value]="s">{{ s }}</option> }
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Yoqilg‘i turi *</legend>
+      <div class="chips">
+        @for (f of fuelsList; track f) {
+          <button type="button" class="chip" [class.chip--on]="fuels().includes(f)" (click)="toggleFuel(f)">{{ f }}</button>
+        }
+      </div>
+      @if (submitted() && !fuels().length) { <small class="err">Kamida bitta yoqilg‘i turini tanlang</small> }
+    </fieldset>
+
+    <fieldset>
+      <legend>Texnik ko‘rsatkichlar</legend>
+      <div class="grid">
+        <div class="field span2">
+          <label for="engine">Dvigatel *</label>
+          <input id="engine" class="input" formControlName="engine" placeholder="4.4L V8 TwinPower Turbo" />
+          @if (invalid('engine')) { <small class="err">Dvigatel ma’lumotini kiriting</small> }
+        </div>
+        <div class="field"><label for="hp">Quvvat (o.k.)</label><input id="hp" class="input" type="number" formControlName="hp" /></div>
+        <div class="field"><label for="torque">Moment (N·m)</label><input id="torque" class="input" type="number" formControlName="torque" /></div>
+        <div class="field"><label for="accel">0–100 (s)</label><input id="accel" class="input" type="number" step="0.1" formControlName="accel" /></div>
+        <div class="field"><label for="top">Maks. tezlik</label><input id="top" class="input" type="number" formControlName="topSpeed" /></div>
+        <div class="field">
+          <label>Uzatma</label>
+          <div class="segmented">
+            <button type="button" [class.on]="form.controls.transmission.value === 'Avtomat'" (click)="form.controls.transmission.setValue('Avtomat')">Avtomat</button>
+            <button type="button" [class.on]="form.controls.transmission.value === 'Mexanika'" (click)="form.controls.transmission.setValue('Mexanika')">Mexanika</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Yuritma</label>
+          <div class="segmented">
+            @for (d of ['AWD', 'RWD', 'FWD']; track d) {
+              <button type="button" [class.on]="form.controls.drive.value === d" (click)="form.controls.drive.setValue($any(d))">{{ d }}</button>
+            }
+          </div>
+        </div>
+        <div class="field"><label for="seats">O‘rinlar</label><input id="seats" class="input" type="number" formControlName="seats" /></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Narx va joylashuv</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="price">Narx ($) *</label>
+          <input id="price" class="input" type="number" formControlName="price" />
+          @if (invalid('price')) { <small class="err">Kamida $1 000</small> }
+        </div>
+        <div class="field">
+          <label for="rent">Ijara / kun ($) *</label>
+          <input id="rent" class="input" type="number" formControlName="rentPerDay" />
+        </div>
+        <div class="field span2"><label for="loc">Joylashuv</label><input id="loc" class="input" formControlName="location" /></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ranglar <small>(birinchisi asosiy)</small></legend>
+      <div class="swatches">
+        @for (c of palette; track c.hex) {
+          <button type="button" class="sw" [class.on]="hasColor(c)" [style.background]="c.hex" [attr.aria-label]="c.name" [title]="c.name" (click)="toggleColor(c)">
+            @if (hasColor(c)) { <app-icon name="check" [size]="13" [stroke]="2.6" /> }
+          </button>
+        }
+      </div>
+    </fieldset>
+
+    <label class="checkbox feat">
+      <input type="checkbox" formControlName="featured" /> Bosh sahifada ko‘rsatish (featured)
+    </label>
+  </div>
+
+  <footer class="drawer__foot">
+    <button type="button" class="btn btn--light" (click)="closed.emit()">Bekor qilish</button>
+    <button type="submit" class="btn btn--dark"><app-icon name="check" [size]="15" /> {{ car() ? 'Saqlash' : 'Qo‘shish' }}</button>
+  </footer>
+</form>

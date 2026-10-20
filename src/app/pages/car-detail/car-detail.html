@@ -1,0 +1,226 @@
+@if (car(); as car) {
+  <div class="container page">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <button type="button" class="icon-btn icon-btn--sm" aria-label="Orqaga" (click)="back()"><app-icon name="arrow-left" [size]="14" /></button>
+      <a routerLink="/">Bosh sahifa</a><span>/</span>
+      <a routerLink="/cars">Avtomobillar</a><span>/</span>
+      <b>{{ car.make }} {{ car.model }}</b>
+    </nav>
+
+    <!-- SHOWCASE -->
+    <section class="showcase">
+      <div class="showcase__title">
+        <h1>{{ car.make }} <span class="info" title="{{ car.description }}"><app-icon name="info" [size]="16" /></span></h1>
+        <p>{{ car.model }} {{ car.trim }} — {{ car.year }}</p>
+      </div>
+
+      <div class="cats" role="tablist" aria-label="Xususiyat toifalari">
+        @for (cat of categories; track cat) {
+          <button type="button" role="tab" [class.on]="category() === cat" [attr.aria-selected]="category() === cat"
+            (click)="category.set(cat); activeSpot.set(null)">{{ cat }}</button>
+        }
+      </div>
+
+      <div class="stage">
+        <span class="stage__emblem" aria-hidden="true">{{ car.make.charAt(0) }}</span>
+        <div class="note">
+          {{ car.make }} uchun turli kafolat variantlari mavjud — yangi yoki sertifikatlangan (CPO) avtomobillar uchun.
+        </div>
+        @for (key of [car.id + angle() + color()]; track key) {
+          <app-car-image class="stage__car" [car]="car" [color]="color()" [angle]="angle()" [width]="1600" [eager]="true" />
+        }
+        @for (h of hotspots(); track h.label; let i = $index) {
+          <button type="button" class="spot" [class.on]="activeSpot() === i" [style.left.%]="h.x" [style.top.%]="h.y"
+            [style.animation-delay.ms]="i * 90" (click)="activeSpot.set(activeSpot() === i ? null : i)">
+            <span class="spot__dot"></span>
+            <span class="spot__label">{{ h.label }}</span>
+          </button>
+        }
+      </div>
+
+      <aside class="side">
+        <div class="power">
+          <div class="power__head">
+            <span class="icon-btn icon-btn--sm"><app-icon name="award" [size]="15" /></span>
+            Tengsiz quvvat
+          </div>
+          <p>Qo‘lda yig‘ilgan {{ car.hp }} o.k. {{ car.engine }} {{ car.torque }} N·m moment beradi. Agressiv uslub ilg‘or texnologiyalarni o‘rab oladi.</p>
+        </div>
+        <div class="accessory">
+          <app-icon name="infinity" [size]="18" /> vpc-aksessuarlar
+        </div>
+        <div class="price-card">
+          <span class="eyebrow">Narx</span>
+          <b>${{ car.price | number }}</b>
+          <small>yoki ${{ car.rentPerDay }} / kun ijarada</small>
+          <div class="price-card__actions">
+            <button type="button" class="btn btn--dark btn--sm" (click)="scrollToBook()">Bron qilish</button>
+            <button type="button" class="icon-btn icon-btn--sm" [class.fav]="store.isFavorite(car.id)"
+              [attr.aria-label]="store.isFavorite(car.id) ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo‘shish'"
+              (click)="store.toggleFavorite(car.id)">
+              <app-icon name="heart" [size]="15" [fill]="store.isFavorite(car.id)" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="angles" aria-label="Ko‘rish burchagi">
+        @for (a of angles; track a) {
+          <button type="button" [class.on]="angle() === a" [attr.aria-label]="'Burchak ' + a" (click)="angle.set(a)">
+            <app-car-image [car]="car" [color]="color()" [angle]="a" [width]="200" />
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS -->
+    <section class="highlights">
+      <div class="highlights__head">
+        <h2>Asosiy xususiyatlar <span class="info"><app-icon name="info" [size]="14" /></span></h2>
+        <div class="colors">
+          <span>Ranglar</span>
+          @for (c of car.colors; track c.hex) {
+            <button type="button" class="swatch" [class.on]="color() === c.hex" [style.background]="c.hex"
+              [attr.aria-label]="c.name" [title]="c.name" (click)="color.set(c.hex)"></button>
+          }
+          <small>{{ colorName() }}</small>
+        </div>
+      </div>
+      <div class="hl">
+        <div class="hl__nav">
+          <button type="button" class="icon-btn" aria-label="Keyingi" [disabled]="highlightOffset() >= highlights().length - 3" (click)="shift(1)"><app-icon name="arrow-right" [size]="16" /></button>
+          <button type="button" class="icon-btn" aria-label="Oldingi" [disabled]="highlightOffset() === 0" (click)="shift(-1)"><app-icon name="arrow-left" [size]="16" /></button>
+        </div>
+        <div class="hl__viewport">
+          <div class="hl__track" [style.--o]="highlightOffset()">
+            @for (h of highlights(); track h.top) {
+              <article class="feature" [class.feature--dark]="h.dark">
+                <span class="feature__icon"><app-icon [name]="h.icon" [size]="17" /></span>
+                @if (h.value) {
+                  <div class="feature__value">{{ h.value }}<small>{{ h.unit }}</small></div>
+                }
+                <div class="feature__text">
+                  <span>{{ h.top }}</span>
+                  <b>{{ h.title }}</b>
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOOK + SPECS -->
+    <section class="details" id="book">
+      <div class="specs card">
+        <h3>Texnik xususiyatlar</h3>
+        <p class="muted">{{ car.description }}</p>
+        <dl>
+          @for (s of specs(); track s[0]) {
+            <div><dt>{{ s[0] }}</dt><dd>{{ s[1] }}</dd></div>
+          }
+        </dl>
+      </div>
+
+      <form class="book card" (submit)="$event.preventDefault(); submit()">
+        <div class="segmented book__modes">
+          <button type="button" [class.on]="mode() === 'buy'" (click)="mode.set('buy')">Sotib olish</button>
+          <button type="button" [class.on]="mode() === 'rent'" (click)="mode.set('rent')">Ijara</button>
+          <button type="button" [class.on]="mode() === 'test'" (click)="mode.set('test')">Test-drayv</button>
+        </div>
+
+        @switch (mode()) {
+          @case ('buy') {
+            <div class="book__big">
+              <span>Oylik to‘lov</span>
+              <b>${{ monthly() | number }}<small>/oy</small></b>
+            </div>
+            <div class="range">
+              <div class="range__label"><span>Boshlang‘ich to‘lov</span><b>{{ downPct() }}% · ${{ car.price * downPct() / 100 | number: '1.0-0' }}</b></div>
+              <input type="range" min="10" max="70" step="5" [value]="downPct()" (input)="downPct.set($any($event.target).valueAsNumber)" aria-label="Boshlang‘ich to‘lov" />
+            </div>
+            <div class="range">
+              <div class="range__label"><span>Muddat</span><b>{{ months() }} oy</b></div>
+              <input type="range" min="12" max="60" step="12" [value]="months()" (input)="months.set($any($event.target).valueAsNumber)" aria-label="Kredit muddati" />
+            </div>
+            <ul class="book__list">
+              <li><span>Avtomobil narxi</span><b>${{ car.price | number }}</b></li>
+              <li><span>Yillik stavka</span><b>{{ rate * 100 | number: '1.1-1' }}%</b></li>
+              <li><span>Jami to‘lov</span><b>${{ monthly() * months() + car.price * downPct() / 100 | number: '1.0-0' }}</b></li>
+            </ul>
+          }
+          @case ('rent') {
+            <div class="book__big">
+              <span>Jami</span>
+              <b>${{ rentTotal() | number }}<small>/ {{ days() }} kun</small></b>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="start">Boshlanish</label>
+                <input id="start" class="input" type="date" [value]="startDate()" (change)="startDate.set($any($event.target).value)" />
+              </div>
+              <div class="field">
+                <label>Kunlar</label>
+                <div class="stepper">
+                  <button type="button" aria-label="Kamaytirish" (click)="days.set(Math.max(1, days() - 1))"><app-icon name="minus" [size]="14" /></button>
+                  <b>{{ days() }}</b>
+                  <button type="button" aria-label="Ko‘paytirish" (click)="days.set(Math.min(30, days() + 1))"><app-icon name="plus" [size]="14" /></button>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="toggle-row" (click)="withDriver.set(!withDriver())">
+              <span>Shaxsiy haydovchi <small>+$60/kun</small></span><span class="switch" [class.switch--on]="withDriver()"></span>
+            </button>
+            <button type="button" class="toggle-row" (click)="fullCover.set(!fullCover())">
+              <span>To‘liq sug‘urta <small>+$25/kun</small></span><span class="switch" [class.switch--on]="fullCover()"></span>
+            </button>
+          }
+          @case ('test') {
+            <div class="book__big">
+              <span>Test-drayv</span>
+              <b>Bepul<small>· 45 daqiqa</small></b>
+            </div>
+            <div class="field">
+              <label for="td">Sana</label>
+              <input id="td" class="input" type="date" [value]="testDate()" (change)="testDate.set($any($event.target).value)" />
+            </div>
+            <div class="slots">
+              @for (t of ['10:00', '12:00', '14:00', '15:00', '17:00', '18:30']; track t; let i = $index) {
+                <button type="button" class="chip chip--pill" [class.chip--on]="i === 3">{{ t }}</button>
+              }
+            </div>
+          }
+        }
+
+        <div class="row2">
+          <input class="input" placeholder="Ismingiz" aria-label="Ism" required />
+          <input class="input" placeholder="+998 __ ___ __ __" aria-label="Telefon" required />
+        </div>
+        <button type="submit" class="btn btn--dark btn--block">
+          {{ mode() === 'buy' ? 'Ariza yuborish' : mode() === 'rent' ? 'Bron qilish' : 'Yozilish' }}
+          <app-icon name="arrow-up-right" [size]="16" />
+        </button>
+        <p class="book__note"><app-icon name="shield" [size]="14" /> Ma’lumotlaringiz himoyalangan. To‘lov faqat tasdiqlangandan keyin.</p>
+      </form>
+    </section>
+
+    <!-- SIMILAR -->
+    <section class="similar">
+      <div class="similar__head">
+        <h2>O‘xshash avtomobillar</h2>
+        <a routerLink="/cars" class="btn btn--light btn--sm">Barchasi <app-icon name="arrow-right" [size]="14" /></a>
+      </div>
+      <div class="similar__grid">
+        @for (c of similar(); track c.id) {
+          <app-car-card [car]="c" />
+        }
+      </div>
+    </section>
+  </div>
+} @else {
+  <div class="container missing">
+    <h1>Avtomobil topilmadi</h1>
+    <p class="muted">Bu avtomobil sotilgan yoki o‘chirilgan bo‘lishi mumkin.</p>
+    <a routerLink="/cars" class="btn btn--dark">Katalogga qaytish</a>
+  </div>
+}
