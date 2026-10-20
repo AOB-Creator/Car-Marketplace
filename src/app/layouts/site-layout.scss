@@ -169,7 +169,7 @@ main {
     font-size: 13px;
   }
 
-  a:not(.logo):not(.btn) {
+  a:not(.logo):not(.btn):not(.social):not(.credit) {
     display: block;
     width: fit-content;
     margin-bottom: 8px;

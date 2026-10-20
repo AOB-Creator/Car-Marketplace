@@ -66,7 +66,7 @@ const REPLIES = [
 
           @if (t.car; as car) {
             <a class="ctx" [routerLink]="['/cars', car.id]">
-              <app-car-image [car]="car" [width]="200" />
+              <app-car-image [car]="car" [width]="160" />
               <div><b>{{ car.make }} {{ car.model }}</b><small>\${{ car.price.toLocaleString('en-US') }} · {{ car.status }}</small></div>
               <app-icon name="arrow-up-right" [size]="14" />
             </a>

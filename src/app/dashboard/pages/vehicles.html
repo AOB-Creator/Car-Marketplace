@@ -155,7 +155,7 @@
               </button>
             </div>
             <a class="v__img" [routerLink]="['/cars', car.id]">
-              <app-car-image [car]="car" [width]="600" />
+              <app-car-image [car]="car" [width]="400" />
             </a>
             <div class="v__body">
               <div>
@@ -190,7 +190,7 @@
                 <tr>
                   <td>
                     <a class="thumb" [routerLink]="['/cars', car.id]">
-                      <app-car-image [car]="car" [width]="200" />
+                      <app-car-image [car]="car" [width]="160" />
                       <div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.trim }} · {{ car.year }}</small></div>
                     </a>
                   </td>

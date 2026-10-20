@@ -27,7 +27,7 @@
           {{ car.make }} uchun turli kafolat variantlari mavjud — yangi yoki sertifikatlangan (CPO) avtomobillar uchun.
         </div>
         @for (key of [car.id + angle() + color()]; track key) {
-          <app-car-image class="stage__car" [car]="car" [color]="color()" [angle]="angle()" [width]="1600" [eager]="true" />
+          <app-car-image class="stage__car" [car]="car" [color]="color()" [angle]="angle()" [width]="1000" [eager]="true" />
         }
         @for (h of hotspots(); track h.label; let i = $index) {
           <button type="button" class="spot" [class.on]="activeSpot() === i" [style.left.%]="h.x" [style.top.%]="h.y"
@@ -67,7 +67,7 @@
       <div class="angles" aria-label="Ko‘rish burchagi">
         @for (a of angles; track a) {
           <button type="button" [class.on]="angle() === a" [attr.aria-label]="'Burchak ' + a" (click)="angle.set(a)">
-            <app-car-image [car]="car" [color]="color()" [angle]="a" [width]="200" />
+            <app-car-image [car]="car" [color]="color()" [angle]="a" [width]="160" />
           </button>
         }
       </div>
