@@ -63,7 +63,7 @@ const PER_PAGE = 10;
                 </td>
                 <td>
                   @if (o.car; as car) {
-                    <div class="thumb"><app-car-image [car]="car" [width]="200" /><div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.trim }}</small></div></div>
+                    <div class="thumb"><app-car-image [car]="car" [width]="160" /><div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.trim }}</small></div></div>
                   } @else { <span class="muted">O‘chirilgan</span> }
                 </td>
                 <td><span class="badge badge--plain">{{ o.kind }}</span></td>

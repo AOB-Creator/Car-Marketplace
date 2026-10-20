@@ -14,7 +14,7 @@
     <div class="hero__stage">
       <span class="hero__word" aria-hidden="true">{{ car.make.split('-')[0] }}</span>
       @for (c of [car]; track c.id) {
-        <app-car-image class="hero__car" [car]="c" [eager]="true" [width]="1400" />
+        <app-car-image class="hero__car" [car]="c" [eager]="true" [width]="1000" />
       }
       <a class="float float--l" [routerLink]="['/cars', car.id]">
         <span class="eyebrow">{{ car.body }}</span>
@@ -104,7 +104,7 @@
     @for (car of perfect(); track car!.id) {
       <article class="ride">
         <a class="ride__img" [routerLink]="['/cars', car!.id]">
-          <app-car-image [car]="car!" [width]="700" />
+          <app-car-image [car]="car!" [width]="500" />
         </a>
         <h3>{{ car!.make }} {{ car!.model }} {{ car!.year }}</h3>
         <ul>
@@ -156,7 +156,7 @@
           <h3>{{ s.title }}</h3>
           @if (serviceCar(); as car) {
             @for (c of [car]; track c.id) {
-              <app-car-image class="dial__car" [car]="c" [width]="700" />
+              <app-car-image class="dial__car" [car]="c" [width]="500" />
             }
           }
           <p>{{ s.text }}</p>
@@ -179,7 +179,7 @@
   <div class="picks" #picks>
     @for (car of topPicks(); track car.id) {
       <a class="pick" [routerLink]="['/cars', car.id]">
-        <app-car-image [car]="car" [width]="700" />
+        <app-car-image [car]="car" [width]="500" />
         <div class="pick__meta">
           <span>{{ car.make }} {{ car.model }}</span>
           <span class="rating"><app-icon name="star" [size]="13" [fill]="true" /> {{ car.rating }}</span>
@@ -215,7 +215,7 @@
     </div>
     @if (heroCars()[1]; as car) {
       <div class="steps__visual">
-        <app-car-image [car]="car" [width]="800" angle="01" />
+        <app-car-image [car]="car" [width]="600" angle="01" />
         <div class="steps__badge">
           <app-icon name="shield" [size]="18" />
           <div><b>To‘liq sug‘urta</b><span>Har bir ijarada</span></div>
@@ -278,7 +278,7 @@
       <a routerLink="/dashboard" class="btn btn--accent">Dashboardni ochish <app-icon name="arrow-up-right" [size]="16" /></a>
     </div>
     @if (heroCars()[2]; as car) {
-      <app-car-image class="cta__car" [car]="car" [width]="900" />
+      <app-car-image class="cta__car" [car]="car" [width]="600" />
     }
   </div>
 </section>

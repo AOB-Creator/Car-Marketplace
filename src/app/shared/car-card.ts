@@ -24,7 +24,7 @@ import { Icon } from './icon';
           <span class="go"><app-icon name="arrow-up-right" [size]="16" /></span>
         </div>
       </div>
-      <app-car-image class="img" [car]="car()" [width]="700" />
+      <app-car-image class="img" [car]="car()" [width]="500" />
       <div class="specs">
         <div><b>{{ car().torque }} N·m</b><span>Maks. moment</span></div>
         <div><b>{{ car().accel }} s</b><span>0–100 km/s</span></div>

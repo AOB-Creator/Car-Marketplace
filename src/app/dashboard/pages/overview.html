@@ -92,7 +92,7 @@
               </td>
               <td>
                 @if (o.car; as car) {
-                  <div class="thumb"><app-car-image [car]="car" [width]="200" /><div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.year }}</small></div></div>
+                  <div class="thumb"><app-car-image [car]="car" [width]="160" /><div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.year }}</small></div></div>
                 }
               </td>
               <td>{{ o.kind }}</td>
@@ -128,7 +128,7 @@
     @if (star(); as car) {
       <a class="panel star" [routerLink]="['/cars', car.id]">
         <span class="badge badge--dark badge--plain"><app-icon name="star" [size]="12" [fill]="true" /> Oy avtomobili</span>
-        <app-car-image [car]="car" [width]="600" />
+        <app-car-image [car]="car" [width]="500" />
         <div class="star__meta">
           <div><b>{{ car.make }} {{ car.model }}</b><small>{{ car.reviews }} ta buyurtma · {{ car.rating }} ★</small></div>
           <span class="icon-btn icon-btn--sm icon-btn--dark"><app-icon name="arrow-up-right" [size]="14" /></span>
@@ -162,7 +162,7 @@
       @for (car of topCars(); track car.id; let i = $index) {
         <li>
           <span class="top__n">{{ i + 1 }}</span>
-          <app-car-image [car]="car" [width]="200" />
+          <app-car-image [car]="car" [width]="160" />
           <div><b>{{ car.make }} {{ car.model }}</b><small>${{ car.rentPerDay }}/kun</small></div>
           <div class="top__bar"><span [style.width.%]="(car.reviews / topCars()[0].reviews) * 100"></span></div>
           <em>{{ car.reviews }}</em>

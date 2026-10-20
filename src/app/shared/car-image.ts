@@ -14,7 +14,10 @@ import { Car } from '../core/models';
         [src]="src()"
         [alt]="car().make + ' ' + car().model"
         [attr.loading]="eager() ? 'eager' : 'lazy'"
+        [attr.fetchpriority]="eager() ? 'high' : 'auto'"
         decoding="async"
+        [class.ready]="loaded()"
+        (load)="loaded.set(true)"
         (error)="failed.set(true)"
       />
     } @else {
@@ -57,10 +60,21 @@ import { Car } from '../core/models';
       </svg>
     }
   `,
+  host: { '[class.loading]': '!loaded() && !failed()' },
   styles: `
     :host { display: block; position: relative; }
     img, svg { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 18px 18px rgba(0,0,0,.12)); }
+    img { opacity: 0; transform: translateY(6px); transition: opacity .45s var(--ease), transform .6s var(--ease); }
+    img.ready { opacity: 1; transform: none; }
     svg { filter: none; }
+    /* Skeleton while the render streams in. */
+    :host(.loading)::before {
+      content: ''; position: absolute; left: 12%; right: 12%; top: 34%; bottom: 22%;
+      border-radius: 40% 40% 18% 18% / 55% 55% 20% 20%;
+      background: linear-gradient(100deg, rgba(0,0,0,.05) 30%, rgba(0,0,0,.1) 50%, rgba(0,0,0,.05) 70%);
+      background-size: 300% 100%; animation: shimmer 1.3s linear infinite;
+    }
+    @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
   `,
 })
 export class CarImage {
@@ -72,6 +86,7 @@ export class CarImage {
   readonly eager = input(false);
 
   protected readonly failed = linkedSignal({ source: () => this.src(), computation: () => false });
+  protected readonly loaded = linkedSignal({ source: () => this.src(), computation: () => false });
 
   private readonly paint = computed(() => {
     const car = this.car();

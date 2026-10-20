@@ -58,12 +58,12 @@ import { DecimalPipe } from '@angular/common';
     }
     .inputs { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
     .box {
-      flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 6px;
-      height: 40px; padding: 0 12px; border-radius: var(--radius-sm); background: var(--surface-2);
-      font-size: 12px; min-width: 0;
+      flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 1px;
+      height: 46px; padding: 0 12px; border-radius: var(--radius-sm); background: var(--surface-2);
+      font-size: 12px; min-width: 0; overflow: hidden;
     }
     .box span { color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-size: 10px; }
-    .box b { font-weight: 600; font-size: 13px; white-space: nowrap; }
+    .box b { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .dash { color: var(--muted); }
   `,
 })

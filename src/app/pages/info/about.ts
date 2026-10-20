@@ -18,7 +18,7 @@ import { Icon } from '../../shared/icon';
 
     @if (car(); as car) {
       <section class="container banner">
-        <app-car-image [car]="car" [width]="1400" angle="01" />
+        <app-car-image [car]="car" [width]="1000" angle="01" />
         <div class="banner__stats">
           @for (s of stats; track s.label) {
             <div><b>{{ s.value }}</b><span>{{ s.label }}</span></div>
