@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { CarStore } from '../core/car-store.service';
+import { CREDIT } from '../core/brand';
 import { Icon } from '../shared/icon';
 
 @Component({
@@ -19,6 +20,7 @@ export class SiteLayout {
   protected readonly scrolled = signal(false);
   protected readonly year = new Date().getFullYear();
   protected readonly email = signal('');
+  protected readonly credit = CREDIT;
 
   protected readonly nav = [
     { label: 'Bosh sahifa', link: '/', exact: true },

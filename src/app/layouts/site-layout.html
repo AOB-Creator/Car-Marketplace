@@ -79,6 +79,9 @@
     </div>
     <div class="footer__bottom">
       <span>© {{ year }} CARZONE. Barcha huquqlar himoyalangan.</span>
+      <a class="credit" [href]="credit.url" target="_blank" rel="noopener">
+        Made by <b>{{ credit.name }}</b> <app-icon name="arrow-up-right" [size]="12" />
+      </a>
       <div>
         <a href="#">Maxfiylik siyosati</a>
         <a href="#">Foydalanish shartlari</a>

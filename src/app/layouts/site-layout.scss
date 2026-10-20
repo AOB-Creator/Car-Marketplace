@@ -258,3 +258,31 @@ main {
     grid-template-columns: 1fr;
   }
 }
+
+.credit {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  margin: 0 !important;
+  padding: 6px 12px;
+  border-radius: var(--pill);
+  background: var(--surface-2);
+  font-size: 12px !important;
+  transition:
+    background 0.2s,
+    color 0.2s !important;
+
+  b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  &:hover {
+    background: var(--ink);
+    color: #fff !important;
+
+    b {
+      color: #fff;
+    }
+  }
+}
